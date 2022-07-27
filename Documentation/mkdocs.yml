@@ -1,0 +1,47 @@
+site_name: Ubiq Docs
+nav:
+    - Home: index.md
+    - Tutorials:
+        - Getting Started:
+            - Getting Ubiq: gettingubiq.md
+            - Setting Up VR: settingupvr.md
+            - Creating Networked Objects: creatinganetworkedobject.md
+            - Object Spawning: spawningobjects.md
+            - Ownership: objectownership.md
+            - Interaction with Ubiq XR: ubiqxrinteraction.md
+            - Servers and Rooms: serversandrooms.md
+            - Testing with Local Loopback: localloopback.md
+            - Logging: eventlogginggettingstarted.md
+        - Server:
+            - Running the server: serversetup.md
+    - Nexus: nexus.md
+    - Advanced:
+        - Interaction: xrinteraction.md
+        - Logging:
+            - Introduction: eventlogging.md
+            - Analysis: eventloganalysis.md
+            - Examples:
+                - Questionnaire: eventloggingexperimentquestionnaire.md
+                - Unit Tests: eventloggingunittests.md
+                - LogCollector Service: eventloggingcollectorservice.md
+            - Serialisation and Memory: eventlogserialisation.md
+        - Messaging:
+            - Introduction: messaging.md
+            - Object and Component Ids: objectids.md
+            - Generating Unique Ids: generatinguniqueids.md
+            - Types: networkidtype.md
+            - Reserved IDs: reservedids.md
+        - WebRtc: webrtc.md
+        - Servers and Rooms: 
+            - Introduction: serverintroduction.md
+            - Server Overview: serveroverview.md
+            - Heartbeat and Timeouts: serverheartbeat.md
+            - Leaving and Joining: leavingandjoiningrooms.md
+        - Bots: botssample.md
+    - Programming:
+        - Async Design Patterns: asyncdesignpatterns.md
+    - Development:
+        - Packaging: packaging.md
+    - Meta: mkdocs.md
+    
+theme: readthedocs    

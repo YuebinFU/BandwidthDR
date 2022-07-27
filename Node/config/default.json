@@ -1,0 +1,16 @@
+{
+    "roomserver":
+    {
+        "ports":
+        {
+            "tcp": 8007,
+            "ws": 8008
+        }
+    },
+    "iceservers":
+    [
+        {
+            "uri" : "stun:stun.l.google.com:19302"
+        }
+    ]
+}
