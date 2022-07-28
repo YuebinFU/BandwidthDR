@@ -34,15 +34,13 @@ public class CubeScript : NetworkBehaviour
     // for remote using
     float remoteSpeed;
     Vector3 remoteDirection;
-    Vector3 oldPosition;
-    Vector3 newPosition;
-    float weight = 0.1f;
+    bool received = false;
 
     // thresholds for blending
-    const float epilsonForSpeed = 0.2F;
-    const float epilsonForPosition = 0.2F;
-    const float epilsonForBlendingDistance = 1F;
-    const float epilsonForRotation = 10F;
+    const float epilsonForSpeed = 0.5F;
+    const float epilsonForPosition = 0.5F;
+    const float epilsonForBlendingDistance = 0.5F;
+    const float epilsonForRotation = 30F;
 
 
     public struct Message
@@ -182,7 +180,7 @@ public class CubeScript : NetworkBehaviour
             // printUnit("update in remote", transform.position.ToString());
         }
 
-        LE.Log("CubeScript", this.transform.position, owner, networkId, networkScene.GetComponent<RoomClient>().Me.networkId);
+        LE.Log("CubeScript", this.transform.position, owner, networkId);
 
         // Logging Latency
         // reset timerecord
@@ -198,7 +196,6 @@ public class CubeScript : NetworkBehaviour
     protected override void OnSpawn(bool local)
     {
         owner = local;
-        Debug.Log(local);
     }
 
     private void printUnit(string info, string printPosition)
