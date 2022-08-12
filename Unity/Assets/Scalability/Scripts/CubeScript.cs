@@ -13,6 +13,7 @@ public class CubeScript : NetworkBehaviour
     // NetworkContext ctx;
     // NetworkScene ns;
     public bool owner = true;
+    public float blendTime = 0.1f;
     private Rigidbody body;
     private LogEmitter LE;
     private LatencyMeter LM;
@@ -34,13 +35,13 @@ public class CubeScript : NetworkBehaviour
     // for remote using
     float remoteSpeed;
     Vector3 remoteDirection;
-    bool received = false;
 
     // thresholds for blending
     const float epilsonForSpeed = 0.5F;
     const float epilsonForPosition = 0.5F;
     const float epilsonForBlendingDistance = 0.5F;
     const float epilsonForRotation = 30F;
+    
 
 
     public struct Message
@@ -64,23 +65,41 @@ public class CubeScript : NetworkBehaviour
          * Here I just simply take average of them
          */
         var msg = message.FromJson<Message>();
-        if (Vector3.Distance(msg.transform.position,transform.position) > epilsonForBlendingDistance)
+
+        // blending
+        blendStart = Time.time;
+        blendEnd = Time.time + blendTime;
+        initialLocalPosition = transform.position;
+        initialRemotePosition = msg.transform.position;
+        localVelocity = speed * direction;
+        remoteVelocity = msg.speedForMessage * msg.directionForMessage;
+
+        speed = remoteSpeed;
+        direction = remoteDirection;
+        remoteSpeed = msg.speedForMessage;
+        remoteDirection = msg.directionForMessage;
+
+        if (Vector3.Distance(msg.transform.position, transform.position) > epilsonForBlendingDistance)
         {
-            // if the distance is too large, we don't blend them
+            // if the distance is too large, we set the position directly
             transform.localPosition = msg.transform.position;
             transform.localRotation = msg.transform.rotation;
-            speed = msg.speedForMessage;
-            direction = msg.directionForMessage;
         }
-        else
-        {
-            // blending
-            transform.localRotation = msg.transform.rotation;
-            speed = (msg.speedForMessage + speed) / 2;
-            direction = (msg.directionForMessage + direction) / 2;
-        }
-        // printUnit("processing message", msg.transform.position.ToString());
+
+        // in Update()... for non-owner
+        // var localTrajectory = initialLocalPosition + localVelocity * (Time.time - blendStart);
+        // var remoteTrajectory = initiaRemotePosition + remoteVelocity * (Time.time - blendStart);
+        // var t = Mathf.Clamp01((Time.time - blendStart) / (blendEnd- blendStart));
+        // transform.position = localTrajectory * (1-t) + remoteTrajectory * t; 
     }
+
+    float blendStart = -1;
+    float blendEnd = -1;
+    Vector3 initialLocalPosition;
+    Vector3 initialRemotePosition;
+    Vector3 localVelocity;
+    Vector3 remoteVelocity;
+
 
     // Start is called before the first frame update
     protected override void Started()
@@ -124,44 +143,63 @@ public class CubeScript : NetworkBehaviour
             }
             */
 
-            if (timeRecord >= 0.1f)
-            {
-                // update speed and remote position 10 times per second
-                speed = Vector3.Distance(this.transform.position, beforePosition);
-                direction = (this.transform.position - beforePosition).normalized;
-                remotePosition += remoteDirection * remoteSpeed;
-            }
+            speed = Vector3.Distance(this.transform.position, beforePosition);
+            direction = (this.transform.position - beforePosition).normalized;
+
 
             // update remote position
+            remoteVelocity = remoteSpeed * remoteDirection;
+            var remoteTrajectory = initialRemotePosition + remoteVelocity * (Time.time - blendStart);
 
             // in three cases we will send packets to remote ownership
-            // first, the difference value between local and remote speed exceed the threshold for speed; 
-            // second, the distance between local and remote position exceed the threshold for position;
-            // third, the change of rotation exceed the threshold for rotation
-            if (Mathf.Abs(speed - remoteSpeed) > epilsonForSpeed 
-                || Vector3.Distance(this.transform.position, remotePosition) > epilsonForPosition 
-                || Quaternion.Angle(transform.rotation, remoteRotation) > epilsonForRotation)
+            // first, the distance between local and remote position exceed the threshold for position;
+            if (blendStart < 0 || Vector3.Distance(transform.position,remoteTrajectory) > epilsonForPosition)
             {
                 SendJson(new Message(transform, speed, direction));
-                // printUnit("sending message because the error is larger the threshold", transform.position.ToString());
+                blendStart = Time.time;
+                initialRemotePosition = transform.position;
+                remoteSpeed = speed;
+                remoteRotation = transform.rotation;
 
-                if (Vector3.Distance(remotePosition,transform.position) > epilsonForBlendingDistance)
+                if (Vector3.Distance(remoteTrajectory, transform.position) > epilsonForBlendingDistance)
                 {
-                    // if the distance is too large, we don't blend them
-                    remoteSpeed = speed;
-                    remoteDirection = direction;
-                    remoteRotation = transform.rotation;
+                    // if the distance is too large, we set the position directly
                     remotePosition = transform.position;
-                }
-                else 
-                {
-                    // blending
-                    remoteSpeed = (remoteSpeed + speed) / 2;
-                    remoteDirection = (remoteDirection + direction) / 2;
                     remoteRotation = transform.rotation;
                 }
-                LE.Log("Send Message due to error exceed threshold");
-                // update remote speed and direction
+
+                //    LE.Log("Send Message due to error exceed threshold");
+            }
+
+            // second, the difference value between local and remote speed exceed the threshold for speed; 
+            if (blendStart < 0 || Mathf.Abs(speed - remoteSpeed) > epilsonForSpeed)
+            {
+                SendJson(new Message(transform, speed, direction));
+                blendStart = Time.time;
+                initialRemotePosition = transform.position;
+                remoteSpeed = speed;
+                remoteRotation = transform.rotation;
+                if (Vector3.Distance(remoteTrajectory, transform.position) > epilsonForBlendingDistance)
+                {
+                    // if the distance is too large, we set the position directly
+                    remotePosition = transform.position;
+                    remoteRotation = transform.rotation;
+                }
+            }
+            // third, the change of rotation exceed the threshold for rotation
+            if (blendStart < 0 || Quaternion.Angle(transform.rotation, remoteRotation) > epilsonForRotation)
+            {
+                SendJson(new Message(transform, speed, direction));
+                blendStart = Time.time;
+                initialRemotePosition = transform.position;
+                remoteSpeed = speed;
+                remoteRotation = transform.rotation;
+                if (Vector3.Distance(remoteTrajectory, transform.position) > epilsonForBlendingDistance)
+                {
+                    // if the distance is too large, we set the position directly
+                    remotePosition = transform.position;
+                    remoteRotation = transform.rotation;
+                }
             }
         }
         else
@@ -171,12 +209,18 @@ public class CubeScript : NetworkBehaviour
             // disable the physcial simulation if the ownership is remote
             body.isKinematic = true;
 
-            // update the position based on received speed and direction
-
-            if (timeRecord >= 0.1f)
+            if (blendEnd < 0)
             {
-                this.transform.position = this.transform.position + direction * speed;
+                initialRemotePosition = transform.position;
+                blendStart = Time.time;
             }
+
+            localVelocity = speed * direction;
+            remoteVelocity = remoteSpeed * remoteDirection;
+            var localTrajectory = initialLocalPosition + localVelocity * (Time.time - blendStart);
+            var remoteTrajectory = initialRemotePosition + remoteVelocity * (Time.time - blendStart);
+            var t = Mathf.Clamp01((Time.time - blendStart) / (blendEnd - blendStart));
+            transform.position = localTrajectory * (1 - t) + remoteTrajectory * t;
             // printUnit("update in remote", transform.position.ToString());
         }
 

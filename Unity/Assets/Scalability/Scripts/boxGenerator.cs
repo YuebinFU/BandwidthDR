@@ -25,7 +25,11 @@ namespace Ubiq.Samples
 
         public void Use(Hand controller)
         {
-            var cube = NetworkSpawnManager.Find(this).SpawnWithPeerScope(FallingPrefab);
+            for (int i=0;i<10;i++)
+            {
+                var cube = NetworkSpawnManager.Find(this).SpawnWithPeerScope(FallingPrefab);
+                cube.transform.position = new Vector3(10+i*2, 10, 0);
+            }
             //cube.transform.position = ;
         }
 
