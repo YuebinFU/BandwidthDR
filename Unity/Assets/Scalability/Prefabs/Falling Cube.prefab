@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 5447643264439277870}
   - component: {fileID: 5447643264439277865}
   - component: {fileID: 5447643264439277864}
-  - component: {fileID: 5447643264439277867}
   - component: {fileID: 7833940128061159517}
+  - component: {fileID: 5447643264439277867}
+  - component: {fileID: 7641943430719690368}
   m_Layer: 0
   m_Name: Falling Cube
   m_TagString: Untagged
@@ -97,23 +98,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5447643264439277867
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5447643264439277866}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 506758673cc090c42878296984dc594e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  networkId:
-    a: 161068018
-    b: 1179018086
-  __serializedGoid: GlobalObjectId_V1-0-00000000000000000000000000000000-0-0
-  owner: 1
 --- !u!54 &7833940128061159517
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -130,3 +114,38 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5447643264439277867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5447643264439277866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 506758673cc090c42878296984dc594e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkId:
+    a: 260711047
+    b: 1850779264
+  __serializedGoid: GlobalObjectId_V1-0-00000000000000000000000000000000-0-0
+  owner: 1
+  blendTime: 0.1
+--- !u!114 &7641943430719690368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5447643264439277866}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dbe42e969343854faeffb14d0a818a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkId:
+    a: 2480847065
+    b: 3355203870
+  __serializedGoid: GlobalObjectId_V1-0-00000000000000000000000000000000-0-0
+  owner: 1

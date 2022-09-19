@@ -5,6 +5,7 @@ using Ubiq.XR;
 using UnityEngine;
 using Ubiq;
 using Ubiq.Spawning;
+using Ubiq.Logging;
 
 namespace Ubiq.Samples
 {
@@ -18,6 +19,7 @@ namespace Ubiq.Samples
 
         private Hand follow;
         public GameObject FallingPrefab;
+        private LogEmitter start;
 
         public void UnUse(Hand controller)
         {
@@ -31,6 +33,8 @@ namespace Ubiq.Samples
                 cube.transform.position = new Vector3(10+i*2, 10, 0);
             }
             //cube.transform.position = ;
+            start.Log("start");
+
         }
 
         // private Rigidbody body;
@@ -49,7 +53,7 @@ namespace Ubiq.Samples
         // Start is called before the first frame update
         void Start()
         {
-
+            start = new ExperimentLogEmitter(this);
         }
 
         // Update is called once per frame
